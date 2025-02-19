@@ -1,6 +1,4 @@
 "use client";
-import { Socials } from "@/constants";
-import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";  
