@@ -13,7 +13,7 @@ export default function Home() {
         <Skills />
         <Encryption />
         <Projects />
-        <Contact_Us />
+        <Contact_Us  />
         <SocialMediaIcons/>
       </div>
     </main>
