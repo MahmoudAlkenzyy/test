@@ -28,7 +28,6 @@ interface FormData {
 }
 
 const ProductFormComponent = () => {
-  // نستدعي جميع الـ Hooks دائمًا
   const [isClient, setIsClient] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [products, setProducts] = useState<Product[]>([]);
@@ -45,7 +44,6 @@ const ProductFormComponent = () => {
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  // يتم تعيين isClient بعد تحميل الصفحة في المتصفح
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -124,7 +122,7 @@ const ProductFormComponent = () => {
           formData
         );
         toast.success("Product added successfully!");
-        setProducts([res.data, ...products]); // إضافة المنتج الجديد في بداية القائمة
+        setProducts([res.data, ...products]);
       }
       setFormData({
         name: "",
@@ -174,7 +172,6 @@ const ProductFormComponent = () => {
     setProductToDelete(null);
   };
 
-  // نستخدم isClient داخل الـ JSX لتحديد عرض المحتوى
   return (
     <>
       {isClient && (
@@ -281,8 +278,10 @@ const ProductFormComponent = () => {
                           layout="fill"
                           style={{ objectFit: "cover" }}
                           onError={(e) => {
-                            console.error("Image failed to load:", e);
-                            toast.error("Failed to load image. Please try again.");
+                            if (isClient) {
+                              console.error("Image failed to load:", e);
+                              toast.error("Failed to load image. Please try again.");
+                            }
                           }}
                         />
                       </div>
