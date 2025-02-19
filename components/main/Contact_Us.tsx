@@ -1,107 +1,97 @@
 "use client";
-
-import React, { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import dynamic from "next/dynamic";
-import contactAnimation from "../../app/animation/contact_us.json";
+import contactAnimation from "../../app/animation/hero.json";
 
+interface LoginComponentProps {
+  onLoginSuccess: () => void;
+}
+
+// Dynamically import the Lottie component to ensure it only loads on the client side
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
-export default function Contact() {
-  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+const LoginComponent: React.FC<LoginComponentProps> = ({ onLoginSuccess }) => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const whatsappNumber = "01029386477";
-    const message = `الاسم: ${formData.name}%0Aالبريد الإلكتروني: ${formData.email}%0Aالرسالة: ${formData.message}`;
-    const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
-
-    window.open(whatsappLink, "_blank");
-
-    toast.success("WhatsApp will now open your message! 📩", {
-      position: "top-center",
-      autoClose: 3000,
-    });
-
-    setFormData({ name: "", email: "", message: "" });
+    try {
+      const res = await axios.post<{ isAuthenticated: boolean }>(
+        "https://backend-alpha-smoky-74.vercel.app/api/admin/login",
+        {
+          email,
+          password,
+        }
+      );
+      if (res.data.isAuthenticated) {
+        onLoginSuccess();
+      } else {
+        alert("Invalid email or password!");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Invalid email or password!");
+    }
   };
 
   return (
-    <section className="container mx-auto px-4 py-12 text-white" id="contact">
-      <ToastContainer position="top-center" autoClose={3000} style={{ marginTop: "60px" }} />
-
-      <div className="relative z-[500]">
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 text-3xl font-bold">
-          Contact Us
+    <div className="container">
+      <div className="text-center pb-5 ">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 text-3xl font-bold ">
+          Login
         </span>
-        <p className="text-gray-400 max-w-2xl mb-8">
-          As a passionate frontend developer, I&apos;m always eager to connect with fellow professionals, potential clients, and anyone interested in my work...
-        </p> 
       </div>
+      <div className="flex flex-col md:flex-row items-center justify-between bg-[#1a172f5e] backdrop-blur-md p-8 shadow-lg rounded-md relative z-[500] border-[#8d60d4c5] border md:py-11 mb-20">
+        <form onSubmit={handleLogin} className="space-y-4 md:w-1/2">
+          <div className="pb-2">
+            <label htmlFor="email" className="text-xl text-gray-400 mb-1">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full p-3 border rounded-lg bg-gray-800 text-white border-[#8d60d4c5] focus:ring-blue-500 my-2"
+            />
+          </div>
 
-      <div className="flex flex-col md:flex-row items-center justify-between bg-[#1a172f5e] backdrop-blur-md p-8 shadow-lg rounded-md relative z-[500] border-[#8d60d4c5] border">
-        <div className="w-full md:w-1/2">
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div className="flex flex-col">
-              <label htmlFor="name" className="text-sm text-gray-400 mb-1">Name:</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                placeholder="Enter your name"
-                className="w-full p-3 border rounded-lg bg-gray-800 text-white focus:outline-none border-[#8d60d4c5]"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-            </div>
+          <div className="pb-3">
+            <label htmlFor="password" className="text-xl text-gray-400 mb-3">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full p-3 border rounded-lg bg-gray-800 text-white border-[#8d60d4c5] focus:ring-blue-500 my-2"
+            />
+          </div>
 
-            <div className="flex flex-col">
-              <label htmlFor="email" className="text-sm text-gray-400 mb-1">Email Address:</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="Enter your email"
-                className="w-full p-3 border rounded-lg bg-gray-800 text-white focus:outline-none border-[#8d60d4c5]"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="flex flex-col">
-              <label htmlFor="message" className="text-sm text-gray-400 mb-1">Your Message:</label>
-              <textarea
-                id="message"
-                name="message"
-                placeholder="Enter your message"
-                className="w-full p-3 border rounded-lg bg-gray-800 text-white focus:outline-none border-[#8d60d4c5]"
-                value={formData.message}
-                onChange={handleChange}
-                required
-              ></textarea>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full button-primary text-white font-bold py-3 px-6 rounded-lg"
-            >
-              Send Message
-            </button>
-          </form>
-        </div>
-
-        <div className="md:block w-full md:w-1/2 text-center">
-          <Lottie className="contactAnimation" style={{ height: 355 }} animationData={contactAnimation} />
+          <button
+            type="submit"
+            className="w-full button-primary text-white font-bold py-3 px-6 rounded-lg"
+          >
+            Login
+          </button>
+        </form>
+        <div className="w-full md:w-1/2 text-center">
+          <Lottie
+            className="contactAnimation"
+            style={{ height: 355 }}
+            animationData={contactAnimation}
+          />
         </div>
       </div>
-    </section>
+    </div>
   );
-}
+};
+
+export default LoginComponent;
