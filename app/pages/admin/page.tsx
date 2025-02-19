@@ -2,11 +2,13 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import imageCompression from "browser-image-compression";
-import Image from "next/image";
+import dynamic from "next/dynamic";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaGithub, FaLink } from "react-icons/fa";
-import LoginComponent from "./Login";
+
+// Dynamically import the LoginComponent to ensure it only loads on the client side
+const LoginComponent = dynamic(() => import("./Login"), { ssr: false });
 
 interface Product {
   _id: string;
