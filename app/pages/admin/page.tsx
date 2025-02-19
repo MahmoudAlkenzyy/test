@@ -28,6 +28,7 @@ interface FormData {
 }
 
 const ProductFormComponent = () => {
+  const [isClient, setIsClient] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [formData, setFormData] = useState<FormData>({
@@ -44,13 +45,13 @@ const ProductFormComponent = () => {
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    let isMounted = true;
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
     if (isAuthenticated) {
-      fetchProducts().catch(console.error);
+      fetchProducts();
     }
-    return () => {
-      isMounted = false;
-    };
   }, [isAuthenticated]);
 
   const categories = ["HTML & CSS", "React-js", "Next-js", "Node-js", "JavaScript"];
@@ -110,25 +111,29 @@ const ProductFormComponent = () => {
 
   return (
     <div>
-      {!isAuthenticated ? (
-        <LoginComponent onLoginSuccess={() => setIsAuthenticated(true)} />
-      ) : (
-        <form onSubmit={handleSubmit} ref={formRef}>
-          <input type="text" name="name" value={formData.name} onChange={handleChange} required />
-          <input type="text" name="description" value={formData.description} onChange={handleChange} required />
-          <input type="text" name="githubLink" value={formData.githubLink} onChange={handleChange} required />
-          <input type="text" name="projectLink" value={formData.projectLink} onChange={handleChange} required />
-          <select name="category" value={formData.category} onChange={handleChange} required>
-            <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-          <input type="file" name="image" onChange={handleImageChange} accept="image/*" required />
-          <button type="submit">{editId ? "Update Product" : "Add Product"}</button>
-        </form>
+      {isClient && (
+        <>
+          {!isAuthenticated ? (
+            <LoginComponent onLoginSuccess={() => setIsAuthenticated(true)} />
+          ) : (
+            <form onSubmit={handleSubmit} ref={formRef}>
+              <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+              <input type="text" name="description" value={formData.description} onChange={handleChange} required />
+              <input type="text" name="githubLink" value={formData.githubLink} onChange={handleChange} required />
+              <input type="text" name="projectLink" value={formData.projectLink} onChange={handleChange} required />
+              <select name="category" value={formData.category} onChange={handleChange} required>
+                <option value="">Select Category</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+              <input type="file" name="image" onChange={handleImageChange} accept="image/*" required />
+              <button type="submit">{editId ? "Update Product" : "Add Product"}</button>
+            </form>
+          )}
+          <ToastContainer position="top-center" autoClose={3000} />
+        </>
       )}
-      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );
 };
